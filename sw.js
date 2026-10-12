@@ -4,7 +4,7 @@
    · activate：刪舊快取、claim，通知所有視窗；在背景的頁面直接帶到新版
    · fetch：version.json 一律不快取；網頁、程式、清單網路優先（cache:'no-cache'），離線才用快取；
             圖示快取優先；音訊、影片與帶 range 的請求不攔 */
-const VER = '1.1.202610130645-c979a26';
+const VER = '1.3.202610130739-592fa7e';
 const V = '321luke-' + VER;
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
