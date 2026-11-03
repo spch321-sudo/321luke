@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<script>(function(){try{var k='r321.luke.lang',p=localStorage.getItem(k);if((p==='en'||p==='sc')&&!/[?&]tc\b/.test(location.search)){location.replace((p==='en'?'en':'sc')+'.html'+(/[?&]join=/.test(location.search)?location.search:'')+location.hash);return;}localStorage.setItem(k,'tc');var _s=localStorage.getItem('r321.v1');if(_s){var _o=JSON.parse(_s);if(_o&&_o.set&&_o.set.sc){_o.set.sc=0;localStorage.setItem('r321.v1',JSON.stringify(_o));}}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
 <meta name="theme-color" content="#1F4D3D">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4879,6 +4880,7 @@ function applyLang(){
   }
 }
 function toggleSC(){
+  if (typeof LANG_NOW !== 'undefined' && LANG_NOW === 'tc' && typeof goLang === 'function') { goLang('sc'); return; }
   S.set.sc = S.set.sc ? 0 : 1; save();
   // 轉簡是單向的：切回繁體要重讀一次，否則靜態外殼的字回不來
   if (!S.set.sc) { location.reload(); return; }
@@ -5611,11 +5613,9 @@ const LANGS = [
 ];
 const LANG_NOW = 'tc';
 function goLang(k){
-  const l = LANGS.find(x => x.k === k); if (!l) return;
-  toast('切換中…');
-  fetch(l.file, { method:'HEAD' })
-    .then(r => { if (r.ok) location.href = l.file; else toast('這個網站上找不到該版本'); })
-    .catch(() => { location.href = l.file; });
+  const F = {tc:'index.html', sc:'sc.html', en:'en.html'}; const f = F[k]; if (!f) return;
+  try { localStorage.setItem('r321.luke.lang', k); } catch(e){}
+  location.href = f + (/[?&]join=/.test(location.search) ? location.search : '') + location.hash;
 }
 function vLang(){
   try { if (!/^https?:/.test(location.protocol)) return ''; } catch(e){ return ''; }
@@ -7280,11 +7280,12 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   if (window.__tri321) return; window.__tri321 = 1;
   var path = location.pathname, file = (path.split('/').pop() || 'index.html');
   var PAGE = /^en\.html$/i.test(file) ? 'en' : (/^sc\.html$/i.test(file) ? 'sc' : 'tc');
-  var INPLACE = typeof window.toggleSC === 'function' && PAGE === 'tc';
+  var GL = typeof window.goLang === 'function' && typeof window.LANG_NOW !== 'undefined' || (typeof goLang === 'function' && typeof LANG_NOW !== 'undefined');
+  var INPLACE = !GL && typeof window.toggleSC === 'function' && PAGE === 'tc';
   var base = path.replace(/[^\/]*$/, '');
-  function isSC() { try { return !!(S && S.set && S.set.sc); } catch (e) { return false; } }
+  function isSC() { if (GL) return false; try { return !!(S && S.set && S.set.sc); } catch (e) { return false; } }
   function cur() { return PAGE === 'en' ? 'en' : (PAGE === 'sc' ? 'sc' : (isSC() ? 'sc' : 'tc')); }
-  var has = { tc: true, sc: INPLACE, en: PAGE === 'en' };
+  var has = GL ? { tc: true, sc: true, en: true } : { tc: true, sc: INPLACE, en: PAGE === 'en' };
   /* 從別的語言跳回來：index.html?lang=sc / tc */
   try {
     var q = new URLSearchParams(location.search).get('lang');
@@ -7295,6 +7296,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   } catch (e) {}
   function go(k) {
     if (k === cur()) return;
+    if (GL) { try { goLang(k); } catch (e) {} return; }
     if (k === 'en') { location.href = base + 'en.html'; return; }
     if (INPLACE && PAGE === 'tc') { try { toggleSC(); } catch (e) {} paint(); return; }
     if (k === 'sc' && has.scFile) { location.href = base + 'sc.html'; return; }
@@ -7304,7 +7306,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   st.textContent = '.tri321{display:inline-flex;flex:none;border:1px solid rgba(127,127,127,.35);border-radius:999px;overflow:hidden;height:30px;margin:0 2px}' +
     '.tri321 button{border:0;background:transparent;color:inherit;font:600 13px/30px system-ui,-apple-system,"PingFang TC",sans-serif;padding:0 9px;min-width:30px;cursor:pointer}' +
     '.tri321 button.on{background:rgba(127,127,127,.28);font-weight:800}' +
-    '.tri321 button[hidden]{display:none}#lang.tri-hide{display:none!important}';
+    '.tri321 button[hidden]{display:none}#lang.tri-hide,#enGo,#zhGo{display:none!important}';
   document.head.appendChild(st);
   var box = document.createElement('div'); box.className = 'tri321'; box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Language');
   [['tc', '繁'], ['sc', '简'], ['en', 'EN']].forEach(function (x) {
