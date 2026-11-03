@@ -2,7 +2,9 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<script>(function(){try{var k='r321.luke.lang',p=localStorage.getItem(k);if((p==='en'||p==='sc')&&!/[?&]tc\b/.test(location.search)){location.replace((p==='en'?'en':'sc')+'.html'+(/[?&]join=/.test(location.search)?location.search:'')+location.hash);return;}localStorage.setItem(k,'tc');var _s=localStorage.getItem('r321.v1');if(_s){var _o=JSON.parse(_s);if(_o&&_o.set&&_o.set.sc){_o.set.sc=0;localStorage.setItem('r321.v1',JSON.stringify(_o));}}}catch(e){}})();</script>
+<script>/* 各卷存檔獨立（-sk1103）：第一次開時把舊的共用存檔 r321.v1 複製一份到 r321.luke.v1（舊 key 保留，其他卷可能還在用），並設遷移旗標避免重複 */
+try{if(!localStorage.getItem('r321.luke.mig1')){if(!localStorage.getItem('r321.luke.v1')){var _o=localStorage.getItem('r321.v1');if(_o)localStorage.setItem('r321.luke.v1',_o);}localStorage.setItem('r321.luke.mig1','1');}}catch(e){}</script>
+<script>(function(){try{var k='r321.luke.lang',p=localStorage.getItem(k);if((p==='en'||p==='sc')&&!/[?&]tc\b/.test(location.search)){location.replace((p==='en'?'en':'sc')+'.html'+(/[?&]join=/.test(location.search)?location.search:'')+location.hash);return;}localStorage.setItem(k,'tc');var _s=localStorage.getItem('r321.luke.v1');if(_s){var _o=JSON.parse(_s);if(_o&&_o.set&&_o.set.sc){_o.set.sc=0;localStorage.setItem('r321.luke.v1',JSON.stringify(_o));}}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
 <meta name="theme-color" content="#1F4D3D">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4722,7 +4724,7 @@ const byCh = {}; Object.keys(BLK).forEach(c => byCh[+c] = BLK[c]);
 const cuvOf = ref => { const [c, v] = ref.split(':'); const t = D.txt[c]; return t ? (t[+v - 1] || '') : ''; };
 const blkCuv = b => { const t = D.txt[b.ch] || []; let h = '';
   for (let v = b.a; v <= b.z; v++) h += `<p><b>${v}</b>　${esc(t[v - 1] || '')}</p>`; return h; };
-const KEY = 'r321.v1';
+const KEY = 'r321.luke.v1';
 const DAY = 864e5, GAPS = [0, 1, 3, 7, 16, 35, 75];
 
 let S = load();
